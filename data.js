@@ -1,7 +1,11 @@
+function RandomNumber() {
+    return String(Math.floor(Math.random() * Math.floor(10000)));
+}
+
 const pds_set_settings_oyd = {
     "instance_name": "string",
-    "client_id": "8SX1-RBazhic9ftG4HyG2XegrQ2kdLGu0hd-Ty3IZnE",
-    "client_secret": "gEg9_tTh2V1ZK6piL9tZ38YO-1xqXLDXCccJS4uQUJg",
+    "client_id": "-s2bdkM_cv7KYDF5xg_Lj6vil1ZJaLQJ79duOW7J9g4",
+    "client_secret": "s_dR8dzbVES_vvc1-nyb1O_cuzyCz2_bRd3Lr12s4ug",
     "driver": {
         "own_your_data_data_vault": {
             "grant_type": "client_credentials",
@@ -56,9 +60,9 @@ const oca_schema_chunks = [
         "dri": "vgwdgfwg93t2",
         "payload": [
             {
-                "additionalProp1": "string",
-                "additionalProp2": "string",
-                "additionalProp3": "string",
+                "additionalProp1": "string" + RandomNumber(),
+                "additionalProp2": "string" + RandomNumber(),
+                "additionalProp3": "string" + RandomNumber(),
             }
         ],
     },
@@ -67,12 +71,22 @@ const oca_schema_chunks = [
         "payload": [
             {
                 "additionalProp1": "string",
-                "additionalProp2": "string",
+                "additionalProp2": "string" + RandomNumber(),
                 "additionalProp3": "string",
             }
         ],
     },
 ]
+const consent = {
+    "oca_schema_dri": "TestConsent",
+    "label": "TestConsentLabel",
+    "oca_data": {
+        "additionalProp1": "string" + RandomNumber(),
+        "additionalProp2": "string" + RandomNumber(),
+        "additionalProp3": "string" + RandomNumber()
+    }
+}
+
 const oca_schema_chunks_query = `?oca_schema_dri=${oca_schema_chunks[0]['dri']}&oca_schema_dri=${oca_schema_chunks[1]['dri']}`
 module.exports = {
     pds_set_settings_invalid,
@@ -84,4 +98,5 @@ module.exports = {
     pds_activate_thcf,
     oca_schema_chunks,
     oca_schema_chunks_query,
+    consent
 }

@@ -80,58 +80,75 @@ describe(activate_url, () => {
                 expect.fail("Invalid response")
             })
             .catch(function (res) {
-                /pds/
                 expect(res.status).to.equal(422)
             })
     })
 })
-// let get_drivers = a1 + '/pds/drivers'
-// describe(get_drivers, () => {
-//     it('GET Registered Drivers', async () => {
-//         const res = await axios.get(get_drivers)
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//     })
-// })
-// let active_url = a1 + '/pds/active'
-// describe(active_url, () => {
-//     it('GET Active', async () => {
-//         const res = await axios.get(active_url)
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//     })
-// })
-// let post_chunks = a1 + '/pds/oca-schema-chunks/'
-// describe(post_chunks, () => {
-//     it('POST OcaSchemaChunks', async () => {
-//         let res
-//         try {
-//             res = await axios.post(post_chunks, data.oca_schema_chunks)
-//         }
-//         catch (err) { throw Error("Invalid response") }
+let get_drivers = a1 + '/pds/drivers'
+describe(get_drivers, () => {
+    it('GET Registered Drivers', async () => {
+        const res = await axios.get(get_drivers)
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+    })
+})
+let active_url = a1 + '/pds/active'
+describe(active_url, () => {
+    it('GET Active', async () => {
+        const res = await axios.get(active_url)
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+    })
+})
+let post_chunks = a1 + '/pds/oca-schema-chunks/'
+describe(post_chunks, () => {
+    it('POST OcaSchemaChunks', async () => {
+        let res
+        try {
+            res = await axios.post(post_chunks, data.oca_schema_chunks)
+        }
+        catch (err) { throw Error("Invalid response") }
 
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//     })
-//     let get_chunks = post_chunks + data.oca_schema_chunks_query
-//     it('GET OcaSchemaChunks', async () => {
-//         let res
-//         try {
-//             res = await axios.get(get_chunks)
-//         }
-//         catch (err) { throw Error("Invalid response") }
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+    })
+    let get_chunks = post_chunks + data.oca_schema_chunks_query
+    console.log(get_chunks)
+    it('GET OcaSchemaChunks', async () => {
+        let res
+        try {
+            res = await axios.get(get_chunks)
+        }
+        catch (err) { throw Error("Invalid response") }
 
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//     })
-// })
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+    })
+})
 
-// oca_schema_chunks POST 200 OK
-// oca_schema_chunks GET brak payload_dri
-// 2. Zapytać się o format odpowiedzi GET oca_schema_chunks. Gdzie podać oca_schema_dri. Dri to nie to samo co oca_schema_dri
-// 3. Jak powinna wyglądać odpowiedz na POST oca_schema_chunks. Aktualnie zwraca endpoint 200. Czy powinny tam być zamieszczone DRI?
-// 9. Musimy dodac dodatkowy endpoint dla databat, own your data nie powinno miec required scope OK moze być opcjonalny scope. I dodatkowe oyd
+const save_url = a1 + '/pds/save'
+describe(save_url, () => {
+    it('POST GET Save', async () => {
+        try {
+            const payload = { "payload": "abc" }
+            const res = await axios.post(save_url, payload)
+            load_id = res.data['payload_id']
+            expect(res.status).to.equal(200)
 
-// 11. Nie ma endpointu który wyciąga wszystkie instancje PDS. aktywny, drivery, driver1 - mojk twoj
-// 8. POST settings -> Czy napewno dobry response? Pasowało by dodać informację na temat tego czy udało się połączyć! Aktualnie jest ArrayOfSettings 
-    //  Robimy nie array tylko pojedyncze teraz
+            let load_url = a1 + `/pds/${load_id}`
+            const res2 = await axios.get(load_url)
+            expect(res2.status).to.equal(200)
+            expect(res2.data['payload']).to.eq(payload['payload'])
+        }
+        catch (error) { InvalidCodepath(error) }
+    })
+})
+
+const post_consent_url = a1 + '/consents'
+describe(post_consent_url, () => {
+    it('POST Consent', async () => {
+        const res = await axios.post(post_consent_url, data.consent)
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+    })
+})
