@@ -144,10 +144,22 @@ describe(save_url, () => {
     })
 })
 
-const post_consent_url = a1 + '/consents'
-describe(post_consent_url, () => {
+const consent_url = a1 + '/consents'
+describe(consent_url, () => {
+    let consent_uuid
     it('POST Consent', async () => {
-        const res = await axios.post(post_consent_url, data.consent)
+        const res = await axios.post(consent_url, data.consent)
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+        consent_uuid = res.data['consent_uuid']
+    })
+    it('GET Consent', async () => {
+        const res = await axios.get(consent_url)
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+    })
+    it('DELETE Consent', async () => {
+        const res = await axios.delete(consent_url + `/${consent_uuid}`)
         expect(res.status).to.equal(200)
         expect(res).to.satisfyApiSpec
     })
