@@ -78,7 +78,7 @@ const oca_schema_chunks = [
     },
 ]
 const consent = {
-    "oca_schema_dri": "TestConsent",
+    "oca_schema_dri": "consent_dri",
     "label": "TestConsentLabel",
     "oca_data": {
         "additionalProp1": "string" + RandomNumber(),
@@ -86,6 +86,8 @@ const consent = {
         "additionalProp3": "string" + RandomNumber()
     }
 }
+
+
 
 const oca_schema_chunks_query = `?oca_schema_dri=${oca_schema_chunks[0]['dri']}&oca_schema_dri=${oca_schema_chunks[1]['dri']}`
 module.exports = {
@@ -98,5 +100,6 @@ module.exports = {
     pds_activate_thcf,
     oca_schema_chunks,
     oca_schema_chunks_query,
-    consent
+    consent,
+    RandomNumber,
 }

@@ -7,11 +7,17 @@ const expect = chai.expect
 const chaiResponseValidator = require('chai-openapi-response-validator')
 const axios = require('axios')
 const data = require('./data')
+const { assert } = require('chai')
 chai.use(chaiResponseValidator(script_path))
 
 function InvalidCodepath(response, message) {
+    let additional_info = ""
     if (message == undefined) message = ""
-    throw Error("Invalid Codepath " + message + response)
+    if (response.response != undefined) {
+        console.log("Response data: ", response.response.data)
+        additional_info += "\n\tStatus Text: " + response.response.statusText + '\n'
+    }
+    throw Error("Invalid Codepath " + message + response + additional_info)
 }
 
 
@@ -100,31 +106,28 @@ describe(active_url, () => {
         expect(res).to.satisfyApiSpec
     })
 })
-let post_chunks = a1 + '/pds/oca-schema-chunks/'
-describe(post_chunks, () => {
-    it('POST OcaSchemaChunks', async () => {
-        let res
-        try {
-            res = await axios.post(post_chunks, data.oca_schema_chunks)
-        }
-        catch (err) { throw Error("Invalid response") }
+// let post_chunks = a1 + '/pds/oca-schema-chunks/'
+// describe(post_chunks, () => {
+//     it('POST OcaSchemaChunks', async () => {
+//         let res
+//         try {
+//             res = let data = 
+//         expect(res.status).to.equal(200)
+//         expect(res).to.satisfyApiSpec
+//     })
+//     let get_chunks = post_chunks + data.oca_schema_chunks_query
+//     console.log(get_chunks)
+//     it('GET OcaSchemaChunks', async () => {
+//         let res
+//         try {
+//             res = await axios.get(get_chunks)
+//         }
+//         catch (err) { throw Error("Invalid response") }
 
-        expect(res.status).to.equal(200)
-        expect(res).to.satisfyApiSpec
-    })
-    let get_chunks = post_chunks + data.oca_schema_chunks_query
-    console.log(get_chunks)
-    it('GET OcaSchemaChunks', async () => {
-        let res
-        try {
-            res = await axios.get(get_chunks)
-        }
-        catch (err) { throw Error("Invalid response") }
-
-        expect(res.status).to.equal(200)
-        expect(res).to.satisfyApiSpec
-    })
-})
+//         expect(res.status).to.equal(200)
+//         expect(res).to.satisfyApiSpec
+//     })
+// })
 
 const save_url = a1 + '/pds/save'
 describe(save_url, () => {
@@ -146,21 +149,71 @@ describe(save_url, () => {
 
 const consent_url = a1 + '/consents'
 describe(consent_url, () => {
-    let consent_uuid
     it('POST Consent', async () => {
         const res = await axios.post(consent_url, data.consent)
         expect(res.status).to.equal(200)
         expect(res).to.satisfyApiSpec
-        consent_uuid = res.data['consent_uuid']
     })
     it('GET Consent', async () => {
         const res = await axios.get(consent_url)
         expect(res.status).to.equal(200)
         expect(res).to.satisfyApiSpec
-    })
-    it('DELETE Consent', async () => {
-        const res = await axios.delete(consent_url + `/${consent_uuid}`)
-        expect(res.status).to.equal(200)
-        expect(res).to.satisfyApiSpec
+        // console.log(res)
     })
 })
+
+const services_consent_url = a1 + '/consents'
+const services_url = a1 + '/services'
+const services_add_url = services_url + '/add'
+let added_service_uuid = undefined
+describe(services_consent_url, () => {
+    let consent_dri = ""
+    it("POST Consent for use in AddService", async function () {
+        const res = await axios.post(services_consent_url, data.consent)
+        expect(res.status).to.equal(200)
+        expect(res).to.satisfyApiSpec
+        consent_dri = res.data['dri']
+    })
+
+    it('POST Add Service', async () => {
+        try {
+            const res = await axios.post(services_add_url, {
+                "consent_dri": consent_dri,
+                "service_schema_dri": "3trgwgwfsv" + data.RandomNumber(),
+                "label": "string"
+            })
+            added_service_uuid = res.data['service_uuid']
+            assert(added_service_uuid)
+            expect(res.status).to.equal(201)
+            expect(res).to.satisfyApiSpec
+        } catch (error) {
+            InvalidCodepath(error)
+        }
+    })
+})
+
+describe(services_consent_url, () => {
+    it('GET Single service by id', async () => {
+        assert(added_service_uuid)
+        let service_get = services_url + '/' + added_service_uuid
+        try {
+            const res = await axios.get(service_get)
+            expect(res.status).to.equal(200)
+            expect(res).to.satisfyApiSpec
+        } catch (error) {
+            InvalidCodepath(error)
+        }
+    })
+    it('GET All services', async () => {
+        assert(added_service_uuid)
+        let service_get = services_url
+        try {
+            const res = await axios.get(service_get)
+            expect(res.status).to.equal(200)
+            expect(res).to.satisfyApiSpec
+        } catch (error) {
+            InvalidCodepath(error)
+        }
+    })
+})
+
