@@ -87,6 +87,15 @@ const consent = {
     }
 }
 
+function InvalidCodepath(response, message) {
+    let additional_info = ""
+    if (message == undefined) message = ""
+    if (response.response != undefined) {
+        console.log("Response data: ", response.response.data)
+        additional_info += "\n\tStatus Text: " + response.response.statusText + '\n'
+    }
+    throw Error("Invalid Codepath " + message + response + additional_info)
+}
 
 
 const oca_schema_chunks_query = `?oca_schema_dri=${oca_schema_chunks[0]['dri']}&oca_schema_dri=${oca_schema_chunks[1]['dri']}`
@@ -102,4 +111,5 @@ module.exports = {
     oca_schema_chunks_query,
     consent,
     RandomNumber,
+    InvalidCodepath
 }

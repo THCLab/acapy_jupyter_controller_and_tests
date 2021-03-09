@@ -7,19 +7,9 @@ const expect = chai.expect
 const chaiResponseValidator = require('chai-openapi-response-validator')
 const axios = require('axios')
 const data = require('./data')
+const InvalidCodepath = data.InvalidCodepath
 const { assert } = require('chai')
 chai.use(chaiResponseValidator(script_path))
-
-function InvalidCodepath(response, message) {
-    let additional_info = ""
-    if (message == undefined) message = ""
-    if (response.response != undefined) {
-        console.log("Response data: ", response.response.data)
-        additional_info += "\n\tStatus Text: " + response.response.statusText + '\n'
-    }
-    throw Error("Invalid Codepath " + message + response + additional_info)
-}
-
 
 let setting_url = a1 + '/pds/settings'
 describe(setting_url, () => {
