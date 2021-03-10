@@ -1,7 +1,12 @@
 let script_path = "/home/sevni/Documents/thclab/aries/agent-api-spec/swagger-spec.yaml"
-const a1 = "http://localhost:8150"
-const a2 = "http://localhost:8151"
+const agent = ["http://localhost:8150", "http://localhost:8151"]
 const create_admin_inv = "/connections/create-admin-invitation-url"
+const create_inv = "/connections/create-invitation?alias=agent_connection&auto_accept=true&multi_use=true"
+const receive_inv = "/connections/receive-invitation?auto_accept=true"
+const create_did = "/wallet/did/create"
+const set_public_did = "/wallet/did/public"
+const LEDGER_URL = "http://localhost:9000"
+const GENESIS_URL = LEDGER_URL + "/genesis"
 
 const chai = require('chai')
 const expect = chai.expect
@@ -13,18 +18,6 @@ const { assert } = require('chai')
 
 chai.use(chaiResponseValidator(script_path))
 
-// # Process invite url, delete white spaces
-// def processInviteUrl(url):
-//     result = {}
-//     url = url.replace(" ", "")
-//     # Regex(substitution) to extract only the invite string from url
-//     result["invite_string_b64"] = regex.sub(r".*(c\_i\=)", r"", url)
-//     # Decoding invite string using base64 decoder
-//     result["invite_string"] = base64.b64decode(result["invite_string_b64"])
-//     # Converting our invite json string into a dictionary
-//     result["invite"] = json.loads(result["invite_string"])
-//     return result
-
 function ProcessInviteURL(URL) {
     // Grab the query parameters
     index = URL.indexOf("?c_i=") + 5
@@ -35,33 +28,82 @@ function ProcessInviteURL(URL) {
     return content
 }
 
-describe("Services process", () => {
-    let a1_admin_data = ""
-    let a2_admin_data = ""
+let connections = []
+describe("Connecting 2 agents", () => {
+    let admin_data = ["", ""]
     it('Create admin URL', async () => {
-        try {
-            a1_admin_data = await axios.post(a1 + create_admin_inv)
-            a1_admin_data = a1_admin_data.data['invitation_url']
-            a1_admin_data = ProcessInviteURL(a1_admin_data)
-        }
-        catch (error) {
-            InvalidCodepath(error, "Agent1")
-        }
-        try {
-            a2_admin_data = await axios.post(a2 + create_admin_inv)
-            a2_admin_data = a2_admin_data.data['invitation_url']
-            a2_admin_data = ProcessInviteURL(a2_admin_data)
-            console.log(a1_admin_data)
-        }
-        catch (error) {
-            InvalidCodepath(error, "Agent2")
+        for (i in [0, 1]) {
+            try {
+                admin_data[i] = await axios.post(agent[i] + create_admin_inv)
+                admin_data[i] = admin_data[i].data['invitation_url']
+                admin_data[i] = ProcessInviteURL(admin_data[i])
+            }
+            catch (error) {
+                InvalidCodepath(error, "Agent" + String(i))
+            }
         }
     })
-    it('Create admin URL', async () => {
 
-        // 
-        // console.log(a1_admin_data)
-        // console.log(base.toString())
-        // console.log(base)
+    let invi = [undefined, undefined] // invitations
+    it('Connect agents', async () => {
+
+        for (i in [0, 1]) {
+            try {
+                let res = await axios.post(agent[i] + create_inv)
+                invi[i] = res.data
+            }
+            catch (error) {
+                InvalidCodepath(error, "Agent" + String(i))
+            }
+        }
+
+        let j = 1
+        for (i in [0, 1]) {
+            try {
+                let res = await axios.post(agent[i] + receive_inv, {
+                    "label": "Bob",
+                    "recipientKeys": invi[j]['invitation']['recipientKeys'],
+                    "serviceEndpoint": invi[j]['invitation']['serviceEndpoint'],
+                })
+                connections.push(res.data)
+            } catch (error) {
+                InvalidCodepath(error, "Agent" + String(i))
+            }
+            j--
+        }
+
     })
+
+})
+
+async function CreateAndRegisterDID(agent) {
+    let did
+    let verkey
+    let alias = agent
+
+    let res = await axios.post(agent + create_did)
+    did = res.data['result']['did']
+    verkey = res.data['result']['verkey']
+    assert(did)
+    assert(verkey)
+
+    res = await axios.post(LEDGER_URL + "/register", {
+        "did": did, "verkey": verkey, "alias": alias, "role": "ENDORSER"
+    })
+
+    return did
+}
+
+let did = []
+describe("Registering DIDs on ledger", () => {
+    it('Create and register DID on ledger', async () => {
+        for (i in [0, 1]) {
+            did.push(await CreateAndRegisterDID(agent[i]))
+        }
+    }).timeout(10000)
+    it('Set active DID', async () => {
+        for (i in [0, 1]) {
+            let res = await axios.post(agent[i] + set_public_did + "?did=" + did[i])
+        }
+    }).timeout(10000)
 })
