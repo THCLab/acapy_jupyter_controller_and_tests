@@ -142,8 +142,8 @@ describe(services_consent_url, () => {
 
 describe("Test services", () => {
     it('Request services', async () => {
-        let conn_id = connections[0]['connection_id']
-        let res = await axios.get(agent[0] + `/connections/${conn_id}/services`)
+        let conn_id = connections[1]['connection_id']
+        let res = await axios.get(agent[1] + `/connections/${conn_id}/services`)
     })
 })
 
