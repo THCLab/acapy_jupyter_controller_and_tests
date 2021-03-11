@@ -7,5 +7,7 @@ This repo contains endpoint tests which:
 
 ## How to run
 
-> npm install
-> npm test
+```
+npm install
+npm test
+```
