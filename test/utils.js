@@ -132,17 +132,23 @@ let Util = {
         }
         return did
     },
+    sleep: async function (timeMS) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(null);
+            }, timeMS);
+        });
+    },
     WebhookCacher: class {
         constructor(port) {
             const WebSocket = require('ws')
             let url = "ws://localhost:" + String(port)
-            // console.log("webhook url:", url)
             this.ws = new WebSocket(url)
             this.event_queue = []
             this.onmessage = function (message) {
-                console.log("queue:", this.event_queue.length)
                 let message_json = JSON.parse(message.data)
                 message_json['message'] = JSON.parse(message_json['message'])
+                console.log("queue:", this.event_queue.length, message_json['topic'])
                 this.event_queue.push(message_json)
             }
 
@@ -167,11 +173,11 @@ let Util = {
             return undefined
         }
 
-        webhookSeek(topic) {
+        webhookSeek(topic, waitTime = 400) {
             return new Promise(resolve => {
                 setTimeout(() => {
                     resolve(this._webhookSeek(topic));
-                }, 200);
+                }, waitTime);
             });
         }
     }

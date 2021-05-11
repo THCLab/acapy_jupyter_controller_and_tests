@@ -1,5 +1,3 @@
-const utils = require('./utils').Util
-
 const pds_set_settings_oyd = {
     "instance_name": "string",
     "client_id": "-s2bdkM_cv7KYDF5xg_Lj6vil1ZJaLQJ79duOW7J9g4",
@@ -53,14 +51,15 @@ const pds_activate_thcf = {
     "instance_name": "string",
     "driver": "thcf_data_vault"
 }
+const random = () => String(Math.floor(Math.random() * Math.floor(10000)))
 const oca_schema_chunks = [
     {
         "dri": "vgwdgfwg93t2",
         "payload": [
             {
-                "additionalProp1": "string" + utils.randomNumber(),
-                "additionalProp2": "string" + utils.randomNumber(),
-                "additionalProp3": "string" + utils.randomNumber(),
+                "additionalProp1": "string" + random(),
+                "additionalProp2": "string" + random(),
+                "additionalProp3": "string" + random(),
             }
         ],
     },
@@ -69,7 +68,7 @@ const oca_schema_chunks = [
         "payload": [
             {
                 "additionalProp1": "string",
-                "additionalProp2": "string" + utils.randomNumber(),
+                "additionalProp2": "string" + random(),
                 "additionalProp3": "string",
             }
         ],
@@ -79,9 +78,9 @@ const consent = {
     "oca_schema_dri": "test_consent_dri",
     "label": "TestConsentLabel",
     "oca_data": {
-        "additionalProp1": "stringa" + utils.randomNumber(),
-        "additionalProp2": "string" + utils.randomNumber(),
-        "additionalProp3": "string" + utils.randomNumber()
+        "additionalProp1": "stringa" + random(),
+        "additionalProp2": "string" + random(),
+        "additionalProp3": "string" + random()
     }
 }
 
