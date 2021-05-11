@@ -1,6 +1,4 @@
-function RandomNumber() {
-    return String(Math.floor(Math.random() * Math.floor(10000)));
-}
+const utils = require('./utils').Util
 
 const pds_set_settings_oyd = {
     "instance_name": "string",
@@ -60,9 +58,9 @@ const oca_schema_chunks = [
         "dri": "vgwdgfwg93t2",
         "payload": [
             {
-                "additionalProp1": "string" + RandomNumber(),
-                "additionalProp2": "string" + RandomNumber(),
-                "additionalProp3": "string" + RandomNumber(),
+                "additionalProp1": "string" + utils.randomNumber(),
+                "additionalProp2": "string" + utils.randomNumber(),
+                "additionalProp3": "string" + utils.randomNumber(),
             }
         ],
     },
@@ -71,19 +69,19 @@ const oca_schema_chunks = [
         "payload": [
             {
                 "additionalProp1": "string",
-                "additionalProp2": "string" + RandomNumber(),
+                "additionalProp2": "string" + utils.randomNumber(),
                 "additionalProp3": "string",
             }
         ],
     },
 ]
 const consent = {
-    "oca_schema_dri": "consent_dri",
+    "oca_schema_dri": "test_consent_dri",
     "label": "TestConsentLabel",
     "oca_data": {
-        "additionalProp1": "string" + RandomNumber(),
-        "additionalProp2": "string" + RandomNumber(),
-        "additionalProp3": "string" + RandomNumber()
+        "additionalProp1": "stringa" + utils.randomNumber(),
+        "additionalProp2": "string" + utils.randomNumber(),
+        "additionalProp3": "string" + utils.randomNumber()
     }
 }
 
@@ -91,7 +89,7 @@ function InvalidCodepath(response, message) {
     let additional_info = ""
     if (message == undefined) message = ""
     if (response.response != undefined) {
-        console.log("Response data: ", response.response.data)
+        console.log("ERROR: Response data: ", JSON.stringify(response['response']['data']))
         additional_info += "\n\tStatus Text: " + response.response.statusText + '\n'
     }
     throw Error("Invalid Codepath " + message + response + additional_info)
@@ -110,6 +108,5 @@ module.exports = {
     oca_schema_chunks,
     oca_schema_chunks_query,
     consent,
-    RandomNumber,
     InvalidCodepath
 }

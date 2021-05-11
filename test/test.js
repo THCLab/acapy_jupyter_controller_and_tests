@@ -1,4 +1,4 @@
-let script_path = "/home/sevni/Documents/thclab/aries/agent-api-spec/swagger-spec.yaml"
+let script_path = "/home/sev/Work/agent-api-spec/swagger-spec.yaml"
 const a1 = "http://localhost:8150"
 const a2 = "http://localhost:8151"
 
