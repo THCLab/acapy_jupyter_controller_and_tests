@@ -2,10 +2,12 @@
 
 This repo contains endpoint tests which:
 
-* Make sure modified acapy agent endpoints are swagger spec complaiant
-* Make sure the entire service process works from start to end
+* Make sure modified acapy agent endpoints are swagger spec compliant.
+* Make sure the entire service process works from start to end.
 
 ## How to run
 
-> npm install
-> npm test
+```
+npm install
+npm test
+```
