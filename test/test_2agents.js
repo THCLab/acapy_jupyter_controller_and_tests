@@ -8,36 +8,6 @@ const expect = chai.expect
 const axios = require('axios')
 const data = require('./data')
 
-// describe("yes", () => {
-//     it("als", async () => {
-//         let list = [a[0] + URL.pds_settings, a[1] + URL.pds_settings]
-//         for (let i in list)
-//             await Util.post(list[i], data.pds_set_settings_oyd)
-
-//         let connections = await Util.ConnectAgents(a)
-//         let res = await Util.post(a[0] + URL.consents, data.consent)
-//         let consent_dri = res.data['dri']
-//         res = await Util.post(a[0] + URL.services_add, {
-//             "consent_dri": consent_dri,
-//             "service_schema_dri": "3trgwgwfsv" + Util.randomNumber(),
-//             "label": "string"
-//         }, 201)
-//         let added_service_uuid = res['data']['service_uuid']
-//         let conn_id = connections[1]['connection_id']
-//         res = await axios.get(a[1] + URL.requestServices(conn_id))
-//         await Util.sleep(10000)
-//         let event = await hooks[1].webhookSeek("/services/request-service-list/", 10000)
-//         console.log("event: ", event)
-
-//         res = await Util.post(a[1] + URL.apply, {
-//             "user_data": { "data": "text" },
-//             "connection_uuid": connections[1]['connection_id'],
-//             "service_uuid": added_service_uuid
-//         })
-//         console.log(res)
-//     }).timeout(200000)
-// })
-
 let connections = []
 describe("Setup", () => {
     it("Setup", async () => {
@@ -57,7 +27,8 @@ describe("Setup", () => {
 })
 
 let added_service_uuid = undefined
-describe("Add service, define consent", () => {
+let appliance_uuid = undefined
+describe("Service flow", () => {
     let consent_dri = ""
     console.log(a[0] + URL.consents)
     it("POST Consent", async function () {
@@ -81,36 +52,29 @@ describe("Add service, define consent", () => {
 
 
     it("POST Apply", async function () {
-        let event = await hooks[1].webhookSeek("/services/request-service-list/")
+        let event = await hooks[1].webhookSeek(URL.hookRequestServices, 5000)
+        console.log("Request services list: ", event)
 
-        console.log("event: ", event)
         let res = await Util.post(a[1] + URL.apply, {
-            "user_data": { "data": "text" },
+            "user_data": { "dataasdasd": "texasdasdt" + Util.randomNumber() },
             "connection_uuid": connections[1]['connection_id'],
             "service_uuid": added_service_uuid
         })
-    })
-})
+        appliance_uuid = res['data']['appliance_uuid']
+    }).timeout(7000)
 
-// // describe("Accept application", () => {
-// //     it(apply_url, async function () {
-// //         let event = await hooks[0].webhookSeek("/services/application")
-// //         // console.log(event)
-// //         // const apply_url = a[0] + `/applications/${appliance_uuid}/accept`
-// //         // try {
-// //         //     let res = await Util.post(apply_url, {
-// //         //         "user_data": { "data": "text" },
-// //         //         "connection_uuid": connections[1]['connection_id'],
-// //         //         "service_uuid": added_service_uuid
-// //         //     })
-// //         //     expect(res.status).to.equal(200)
-// //         //     expect(res).to.satisfyApiSpec
-// //         // }
-// //         // catch (error) {
-// //         //     InvalidCodepath(error)
-// //         // }
-// //     })
-// // })
+    it("Accept application", async function () {
+        let event = await hooks[0].webhookSeek(URL.hookApplication, 1000)
+        console.log("Webhook Incoming application", event)
+        apps = await Util.get(a[0], + URL.applicationsOther)
+        print("API Incoming Applications: ", apps)
+        // await Util.put(a[0] + URL.acceptApplication(appliance_uuid), {
+        //     "user_data": { "data": "text" },
+        //     "connection_uuid": connections[1]['connection_id'],
+        //     "service_uuid": added_service_uuid
+        // })
+    }).timeout(7000)
+})
 
 after(async () => {
     for (let i = 0; i < hooks.length; i++) hooks[i].terminate()

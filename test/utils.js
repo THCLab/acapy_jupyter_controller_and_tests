@@ -20,7 +20,12 @@ const URL = {
     services: '/services',
     services_add: '/services/add',
     apply: '/services/apply',
-    requestServices: (connID) => `/connections/${connID}/services`
+    requestServices: (connID) => `/connections/${connID}/services`,
+    acceptApplication: (applianceUUID) => `/applications/${applianceUUID}/accept`,
+    hookRequestServices: "/services/request-service-list/",
+    hookApplication: "/services/application",
+    applicationsMine: "/applications/mine",
+    applicationsOther: "/applications/others",
 }
 
 
@@ -30,6 +35,17 @@ let Util = {
     post: async function (url, data, status = 200, shouldSatisfySpec = true) {
         try {
             result = await axios.post(url, data)
+            expect(result.status).to.equal(status)
+            if (shouldSatisfySpec)
+                expect(result).to.satisfyApiSpec
+        } catch (error) {
+            InvalidCodepath(error)
+        }
+        return result
+    },
+    put: async function (url, data, status = 200, shouldSatisfySpec = true) {
+        try {
+            result = await axios.put(url, data)
             expect(result.status).to.equal(status)
             if (shouldSatisfySpec)
                 expect(result).to.satisfyApiSpec
