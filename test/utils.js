@@ -18,8 +18,10 @@ const URL = {
     pdsSettings: '/pds/settings',
     consents: "/consents",
     services: '/services',
-    services_add: '/services/add',
+    servicesAdd: '/services/add',
     pdsActivate: "/pds/activate",
+    pdsDrivers: "/pds/drivers",
+    pdsSave: '/pds/save',
     apply: '/services/apply',
     requestServices: (connID) => `/connections/${connID}/services`,
     acceptApplication: (applianceUUID) => `/applications/${applianceUUID}/accept`,
@@ -29,8 +31,16 @@ const URL = {
     applicationsOther: "/applications/others",
 }
 
+function InvalidCodepath(response, message) {
+    let additional_info = ""
+    if (message == undefined) message = ""
+    if (response.response != undefined) {
+        console.log("ERROR: Response data: ", JSON.stringify(response['response']['data']))
+        additional_info += "\n\tStatus Text: " + response.response.statusText + '\n'
+    }
+    throw Error("Invalid Codepath " + message + response + additional_info)
+}
 
-const InvalidCodepath = data.InvalidCodepath
 
 let Util = {
     post: async function (url, data, status = 200, shouldSatisfySpec = true) {
@@ -41,6 +51,17 @@ let Util = {
                 expect(result).to.satisfyApiSpec
         } catch (error) {
             InvalidCodepath(error)
+        }
+        return result
+    },
+    postInvalid: async function (url, data, status, shouldSatisfySpec = true) {
+        try {
+            result = await axios.post(url, data)
+            InvalidCodepath(error)
+        } catch (error) {
+            expect(error.response.status).to.equal(status)
+            if (shouldSatisfySpec)
+                expect(error.response).to.satisfyApiSpec
         }
         return result
     },
@@ -55,11 +76,12 @@ let Util = {
         }
         return result
     },
-    get: async function (url, status = 200) {
+    get: async function (url, status = 200, shouldSatisfySpec = true) {
         try {
             result = await axios.get(url)
             expect(result.status).to.equal(status)
-
+            if (shouldSatisfySpec)
+                expect(result).to.satisfyApiSpec
         } catch (error) {
             InvalidCodepath(error)
         }

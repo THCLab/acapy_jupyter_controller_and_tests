@@ -39,7 +39,7 @@ describe("Service flow", () => {
     })
 
     it('POST Add Service', async () => {
-        const res = await Util.post(a[0] + URL.services_add, {
+        const res = await Util.post(a[0] + URL.servicesAdd, {
             "consent_dri": consent_dri,
             "service_schema_dri": "3trgwgwfsv" + Util.randomNumber(),
             "label": "string"
