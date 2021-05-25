@@ -5,11 +5,9 @@ const a = URL.agents
 
 
 const chai = require('chai')
-const expect = chai.expect
+const assert = chai.assert
 const chaiResponseValidator = require('chai-openapi-response-validator')
-const axios = require('axios')
 const data = require('./data')
-const { assert } = require('chai')
 chai.use(chaiResponseValidator(script_path))
 
 let settings = a[0] + URL.pdsSettings
@@ -69,7 +67,7 @@ describe(active, () => {
 //     it('GET OcaSchemaChunks', async () => {
 //         let res
 //         try {
-//             res = await axios.get(get_chunks)
+//             res = await Util.get(get_chunks)
 //         }
 //         catch (err) { throw Error("Invalid response") }
 
@@ -78,91 +76,54 @@ describe(active, () => {
 //     })
 // })
 
-// const save_url = a[0] + URL.pdsSave
-// describe(save_url, () => {
-//     it('POST GET Save', async () => {
-//         try {
-//             const payload = { "payload": "abc" }
-//             const res = await Util.post(save_url, payload)
-//             load_id = res.data['payload_id']
-//             expect(res.status).to.equal(200)
+const save_url = a[0] + URL.pdsSave
+describe(save_url, () => {
+    it('POST GET Save', async () => {
+        const payload = { "payload": "abc" }
+        const res = await Util.post(save_url, payload, 200, false)
+        load_id = res.data['payload_id']
+        await Util.get(a[0] + `/pds/${load_id}`, 200, false)
+    })
+})
 
-//             let load_url = a[0] + `/pds/${load_id}`
-//             const res2 = await axios.get(load_url)
-//             expect(res2.status).to.equal(200)
-//             expect(res2.data['payload']).to.eq(payload['payload'])
-//         }
-//         catch (error) { Util.InvalidCodepath(error) }
-//     })
-// })
+const consentURL = a[0] + URL.consents
+describe(consentURL, () => {
+    it('POST Consent', async () => {
+        const res = await Util.post(consentURL, data.consent)
+    })
+    it('GET Consent', async () => {
+        const res = await Util.get(consentURL)
+    })
+})
 
-// const consent_url = a[0] + '/consents'
-// describe(consent_url, () => {
-//     it('POST Consent', async () => {
-//         const res = await axios.post(consent_url, data.consent)
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//     })
-//     it('GET Consent', async () => {
-//         const res = await axios.get(consent_url)
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//         // console.log(res)
-//     })
-// })
+const servicesConsentURL = a[0] + URL.consents
+const servicesURL = a[0] + URL.services
+const servicesAddURL = a[0] + URL.servicesAdd
+let added_service_id = undefined
+describe(servicesConsentURL, () => {
+    let consentDRI = ""
+    it("POST Consent for use in AddService", async function () {
+        const res = await Util.post(servicesConsentURL, data.consent)
+        consentDRI = res.data['dri']
+    })
 
-// const services_consent_url = a[0] + '/consents'
-// const services_url = a[0] + '/services'
-// const servicesAdd_url = services_url + '/add'
-// let added_service_id = undefined
-// describe(services_consent_url, () => {
-//     let consent_dri = ""
-//     it("POST Consent for use in AddService", async function () {
-//         const res = await axios.post(services_consent_url, data.consent)
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//         consent_dri = res.data['dri']
-//     })
+    it('POST Add Service', async () => {
+        console.log(consentDRI)
+        const res = await Util.post(servicesAddURL, {
+            "consent_dri": consentDRI,
+            "service_schema_dri": "3trgwgwfsv" + Util.randomNumber(),
+            "label": "string"
+        }, 201)
+        added_service_id = res.data['service_id']
+    })
 
-//     it('POST Add Service', async () => {
-//         try {
-//             const res = await axios.post(servicesAdd_url, {
-//                 "consent_dri": consent_dri,
-//                 "service_schema_dri": "3trgwgwfsv" + data.RandomNumber(),
-//                 "label": "string"
-//             })
-//             added_service_id = res.data['service_id']
-//             assert(added_service_id)
-//             expect(res.status).to.equal(201)
-//             expect(res).to.satisfyApiSpec
-//         } catch (error) {
-//             Util.InvalidCodepath(error)
-//         }
-//     })
-// })
-
-// describe(services_consent_url, () => {
-//     it('GET Single service by id', async () => {
-//         assert(added_service_id)
-//         let service_get = services_url + '/' + added_service_id
-//         try {
-//             const res = await axios.get(service_get)
-//             expect(res.status).to.equal(200)
-//             expect(res).to.satisfyApiSpec
-//         } catch (error) {
-//             Util.InvalidCodepath(error)
-//         }
-//     })
-//     it('GET All services', async () => {
-//         assert(added_service_id)
-//         let service_get = services_url
-//         try {
-//             const res = await axios.get(service_get)
-//             expect(res.status).to.equal(200)
-//             expect(res).to.satisfyApiSpec
-//         } catch (error) {
-//             Util.InvalidCodepath(error)
-//         }
-//     })
-// })
+    it('GET Single service by id', async () => {
+        assert(added_service_id)
+        await Util.get(servicesURL + '/' + added_service_id)
+    })
+    it('GET All services', async () => {
+        assert(added_service_id)
+        await Util.get(servicesURL)
+    })
+})
 
