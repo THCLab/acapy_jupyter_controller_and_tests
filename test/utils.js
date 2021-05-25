@@ -9,21 +9,22 @@ const { assert, expect } = require('chai')
 
 const URL = {
     agents: ["http://localhost:8150", "http://localhost:8151"],
-    create_admin_inv: "/connections/create-admin-invitation-url",
-    create_inv: "/connections/create-invitation?alias=agent_connection&auto_accept=true&multi_use=true",
-    receive_inv: "/connections/receive-invitation?auto_accept=true",
-    create_did: "/wallet/did/create",
+    createAdminInv: "/connections/create-admin-invitation-url",
+    createInv: "/connections/create-invitation?alias=agent_connection&auto_accept=true&multi_use=true",
+    receiveInv: "/connections/receive-invitation?auto_accept=true",
+    createInv: "/wallet/did/create",
     LEDGER_URL: "http://localhost:9000",
-    set_public_did: "/wallet/did/public",
-    pds_settings: '/pds/settings',
+    setPublicDID: "/wallet/did/public",
+    pdsSettings: '/pds/settings',
     consents: "/consents",
     services: '/services',
     services_add: '/services/add',
+    pdsActivate: "/pds/activate",
     apply: '/services/apply',
     requestServices: (connID) => `/connections/${connID}/services`,
     acceptApplication: (applianceUUID) => `/applications/${applianceUUID}/accept`,
     hookRequestServices: "/services/request-service-list/",
-    hookApplication: "/services/application",
+    hookApplication: "/services/application/",
     applicationsMine: "/applications/mine",
     applicationsOther: "/applications/others",
 }
@@ -85,7 +86,7 @@ let Util = {
 
         for (i in [0, 1]) {
             try {
-                admin_data[i] = await axios.post(agent[i] + URL.create_admin_inv)
+                admin_data[i] = await axios.post(agent[i] + URL.createAdminInv)
                 admin_data[i] = admin_data[i].data['invitation_url']
                 admin_data[i] = ProcessInviteURL(admin_data[i])
             }
@@ -97,7 +98,7 @@ let Util = {
         let invi = [undefined, undefined]
         for (i in [0, 1]) {
             try {
-                let res = await axios.post(agent[i] + URL.create_inv)
+                let res = await axios.post(agent[i] + URL.createInv)
                 invi[i] = res.data
             }
             catch (error) {
@@ -107,7 +108,7 @@ let Util = {
         let j = 1
         for (i in [0, 1]) {
             try {
-                let res = await axios.post(agent[i] + URL.receive_inv, {
+                let res = await axios.post(agent[i] + URL.receiveInv, {
                     "label": "Bob",
                     "recipientKeys": invi[j]['invitation']['recipientKeys'],
                     "serviceEndpoint": invi[j]['invitation']['serviceEndpoint'],
@@ -126,7 +127,7 @@ let Util = {
         let verkey
         let alias = agent
 
-        let res = await axios.post(agent + URL.create_did)
+        let res = await axios.post(agent + URL.createInv)
         did = res.data['result']['did']
         verkey = res.data['result']['verkey']
         assert(did)
@@ -144,7 +145,7 @@ let Util = {
             did.push(await Util.CreateAndRegisterDID(agent[i]))
         }
         for (i in [0, 1]) {
-            let res = await axios.post(agent[i] + URL.set_public_did + "?did=" + did[i])
+            let res = await axios.post(agent[i] + URL.setPublicDID + "?did=" + did[i])
         }
         return did
     },
@@ -164,7 +165,6 @@ let Util = {
             this.onmessage = function (message) {
                 let message_json = JSON.parse(message.data)
                 message_json['message'] = JSON.parse(message_json['message'])
-                console.log("queue:", this.event_queue.length, message_json['topic'])
                 this.event_queue.push(message_json)
             }
 
@@ -181,6 +181,8 @@ let Util = {
 
         _webhookSeek(topic) {
             let formatted_topic = "/topic" + topic
+            if (!formatted_topic.endsWith("/"))
+                formatted_topic += "/"
             for (let i = 0; i < this.event_queue.length; i++) {
                 if (this.event_queue[i]['topic'] == formatted_topic) {
                     return this.event_queue[i]['message']

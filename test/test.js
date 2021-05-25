@@ -155,7 +155,7 @@ describe(consent_url, () => {
 const services_consent_url = a1 + '/consents'
 const services_url = a1 + '/services'
 const services_add_url = services_url + '/add'
-let added_service_uuid = undefined
+let added_service_id = undefined
 describe(services_consent_url, () => {
     let consent_dri = ""
     it("POST Consent for use in AddService", async function () {
@@ -172,8 +172,8 @@ describe(services_consent_url, () => {
                 "service_schema_dri": "3trgwgwfsv" + data.RandomNumber(),
                 "label": "string"
             })
-            added_service_uuid = res.data['service_uuid']
-            assert(added_service_uuid)
+            added_service_id = res.data['service_id']
+            assert(added_service_id)
             expect(res.status).to.equal(201)
             expect(res).to.satisfyApiSpec
         } catch (error) {
@@ -184,8 +184,8 @@ describe(services_consent_url, () => {
 
 describe(services_consent_url, () => {
     it('GET Single service by id', async () => {
-        assert(added_service_uuid)
-        let service_get = services_url + '/' + added_service_uuid
+        assert(added_service_id)
+        let service_get = services_url + '/' + added_service_id
         try {
             const res = await axios.get(service_get)
             expect(res.status).to.equal(200)
@@ -195,7 +195,7 @@ describe(services_consent_url, () => {
         }
     })
     it('GET All services', async () => {
-        assert(added_service_uuid)
+        assert(added_service_id)
         let service_get = services_url
         try {
             const res = await axios.get(service_get)

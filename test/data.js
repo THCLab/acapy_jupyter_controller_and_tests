@@ -1,7 +1,20 @@
 const pds_set_settings_oyd = {
     "instance_name": "string",
-    "client_id": "-s2bdkM_cv7KYDF5xg_Lj6vil1ZJaLQJ79duOW7J9g4",
-    "client_secret": "s_dR8dzbVES_vvc1-nyb1O_cuzyCz2_bRd3Lr12s4ug",
+    "client_id": "gVQJTSabNK8DxNzu3PeGWQwBtXSb2Iv7FgYlbzBEbfg",
+    "client_secret": "9yBmtiyO2YwhtHA9btSrYensVZZ9DLNY1Vq5D-EjxwQ",
+    "driver": {
+        "own_your_data_data_vault": {
+            "grant_type": "client_credentials",
+            "api_url": "https://data-vault.eu"
+        },
+        "name": "own_your_data_data_vault"
+    },
+}
+
+const pds_set_settings_oyd2 = {
+    "instance_name": "string",
+    "client_id": "nM8p2yYuxqGWvbJ50t8ODifjyFZfi-yOm2HoE6AZaW0",
+    "client_secret": "X6WBjmMylTQ3BdbBRKkBir3uVz79RgADetw5tl7Tgyo",
     "driver": {
         "own_your_data_data_vault": {
             "grant_type": "client_credentials",
@@ -100,6 +113,7 @@ module.exports = {
     pds_set_settings_invalid,
     pds_set_settings_local,
     pds_set_settings_oyd,
+    pds_set_settings_oyd2,
     pds_activate_local,
     pds_activate_own_your_data_data_vault,
     pds_activate_invalid,

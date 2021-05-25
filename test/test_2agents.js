@@ -11,26 +11,28 @@ const data = require('./data')
 let connections = []
 describe("Setup", () => {
     it("Setup", async () => {
-        let list = [a[0] + URL.pds_settings, a[1] + URL.pds_settings]
-        for (let i in list)
-            await Util.post(list[i], data.pds_set_settings_oyd)
+        let list = [a[0] + URL.pdsSettings, a[1] + URL.pdsSettings]
+        let creds = [data.pds_set_settings_oyd, data.pds_set_settings_oyd2]
+        for (let i in list) {
+            await Util.post(list[i], creds[i])
+            await Util.post(a[i] + URL.pdsActivate, data.pds_activate_own_your_data_data_vault)
+        }
 
         connections = await Util.ConnectAgents(a)
     }).timeout(20000)
     it("Dids", async () => {
         for (i in a) {
             let did = await Util.CreateAndRegisterDID(a[i])
-            await Util.post(a[i] + URL.set_public_did + "?did=" + did, null, 200, false)
+            await Util.post(a[i] + URL.setPublicDID + "?did=" + did, null, 200, false)
         }
     }).timeout(20000)
 
 })
 
-let added_service_uuid = undefined
-let appliance_uuid = undefined
+let added_service_id = undefined
+let appliance_id = undefined
 describe("Service flow", () => {
     let consent_dri = ""
-    console.log(a[0] + URL.consents)
     it("POST Consent", async function () {
         const res = await Util.post(a[0] + URL.consents, data.consent)
         consent_dri = res.data['dri']
@@ -42,7 +44,7 @@ describe("Service flow", () => {
             "service_schema_dri": "3trgwgwfsv" + Util.randomNumber(),
             "label": "string"
         }, 201)
-        added_service_uuid = res['data']['service_uuid']
+        added_service_id = res['data']['service_id']
     })
 
     it('Request services', async () => {
@@ -53,26 +55,19 @@ describe("Service flow", () => {
 
     it("POST Apply", async function () {
         let event = await hooks[1].webhookSeek(URL.hookRequestServices, 5000)
-        console.log("Request services list: ", event)
-
         let res = await Util.post(a[1] + URL.apply, {
             "user_data": { "dataasdasd": "texasdasdt" + Util.randomNumber() },
-            "connection_uuid": connections[1]['connection_id'],
-            "service_uuid": added_service_uuid
+            "connection_id": connections[1]['connection_id'],
+            "service_id": added_service_id
         })
-        appliance_uuid = res['data']['appliance_uuid']
+        appliance_id = res['data']['appliance_id']
     }).timeout(7000)
 
     it("Accept application", async function () {
-        let event = await hooks[0].webhookSeek(URL.hookApplication, 1000)
-        console.log("Webhook Incoming application", event)
-        apps = await Util.get(a[0], + URL.applicationsOther)
-        print("API Incoming Applications: ", apps)
-        // await Util.put(a[0] + URL.acceptApplication(appliance_uuid), {
-        //     "user_data": { "data": "text" },
-        //     "connection_uuid": connections[1]['connection_id'],
-        //     "service_uuid": added_service_uuid
-        // })
+        // let event = await hooks[0].webhookSeek(URL.hookApplication, 1000)
+        // console.log("Webhook Incoming application", event)
+        let apps = await Util.get(a[0] + URL.applicationsOther)
+        await Util.put(a[0] + URL.acceptApplication(apps.data[0].appliance_id))
     }).timeout(7000)
 })
 

@@ -26,7 +26,7 @@ async function Setup() {
 
     ]
     for (let i = 0; i < 2; i++) {
-        const res = await post(a[i], URL.pds_settings, {
+        const res = await post(a[i], URL.pdsSettings, {
             "settings": {
                 "own_your_data": sett[i]
             }
