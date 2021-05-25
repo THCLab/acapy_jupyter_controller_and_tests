@@ -20,6 +20,7 @@ const URL = {
     services: '/services',
     servicesAdd: '/services/add',
     pdsActivate: "/pds/activate",
+    pdsActive: "/pds/active",
     pdsDrivers: "/pds/drivers",
     pdsSave: '/pds/save',
     apply: '/services/apply',

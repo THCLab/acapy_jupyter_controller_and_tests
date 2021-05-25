@@ -37,10 +37,10 @@ describe(activate, () => {
         await Util.post(activate, data.pds_activate_own_your_data_data_vault)
     })
     it('POST Activate THCF', async () => {
-        await Util.post(activate, data.pds_activate_thcf)
+        await Util.postInvalid(activate, data.pds_activate_thcf, 404)
     })
     it('POST Activate Invalid', async () => {
-        await Util.postInvalid(activate, data.pds_activate_invalid, 422)
+        await Util.postInvalid(activate, data.pds_activate_invalid, 422, false)
     })
 })
 let get_drivers = a[0] + URL.pdsDrivers
@@ -49,10 +49,10 @@ describe(get_drivers, () => {
         await Util.get(get_drivers)
     })
 })
-let activateURL = a[0] + URL.pdsActivate
-describe(activateURL, () => {
+let active = a[0] + URL.pdsActive
+describe(active, () => {
     it('GET Active', async () => {
-        const res = await Util.get(activateURL)
+        await Util.get(active)
     })
 })
 // let post_chunks = a[0] + '/pds/oca-schema-chunks/'
