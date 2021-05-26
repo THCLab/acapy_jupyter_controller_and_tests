@@ -19,6 +19,7 @@ const URL = {
     consents: "/consents",
     services: '/services',
     servicesAdd: '/services/add',
+    pdsChunks: "/pds/oca-schema-chunks/",
     pdsActivate: "/pds/activate",
     pdsActive: "/pds/active",
     pdsDrivers: "/pds/drivers",
@@ -32,7 +33,7 @@ const URL = {
     applicationsOther: "/applications/others",
 }
 
-function InvalidCodepath(response, message) {
+function invalidCodepath(response, message) {
     let additional_info = ""
     if (message == undefined) message = ""
     if (response.response != undefined) {
@@ -51,14 +52,14 @@ let Util = {
             if (shouldSatisfySpec)
                 expect(result).to.satisfyApiSpec
         } catch (error) {
-            InvalidCodepath(error)
+            invalidCodepath(error)
         }
         return result
     },
     postInvalid: async function (url, data, status, shouldSatisfySpec = true) {
         try {
             result = await axios.post(url, data)
-            InvalidCodepath(error)
+            invalidCodepath(error)
         } catch (error) {
             expect(error.response.status).to.equal(status)
             if (shouldSatisfySpec)
@@ -73,7 +74,7 @@ let Util = {
             if (shouldSatisfySpec)
                 expect(result).to.satisfyApiSpec
         } catch (error) {
-            InvalidCodepath(error)
+            invalidCodepath(error)
         }
         return result
     },
@@ -84,14 +85,14 @@ let Util = {
             if (shouldSatisfySpec)
                 expect(result).to.satisfyApiSpec
         } catch (error) {
-            InvalidCodepath(error)
+            invalidCodepath(error)
         }
         return result
     },
     randomNumber: function () {
         return String(Math.floor(Math.random() * Math.floor(10000)));
     },
-    InvalidCodepath: InvalidCodepath,
+    invalidCodepath: invalidCodepath,
     ConnectAgents: async function (agent) {
 
         let connections = []
@@ -114,7 +115,7 @@ let Util = {
                 admin_data[i] = ProcessInviteURL(admin_data[i])
             }
             catch (error) {
-                InvalidCodepath(error, "Agent" + String(i))
+                invalidCodepath(error, "Agent" + String(i))
             }
         }
 
@@ -125,7 +126,7 @@ let Util = {
                 invi[i] = res.data
             }
             catch (error) {
-                InvalidCodepath(error, "Agent" + String(i))
+                invalidCodepath(error, "Agent" + String(i))
             }
         }
         let j = 1
@@ -138,7 +139,7 @@ let Util = {
                 })
                 connections.push(res.data)
             } catch (error) {
-                InvalidCodepath(error, "Agent" + String(i))
+                invalidCodepath(error, "Agent" + String(i))
             }
             j--
         }

@@ -53,28 +53,17 @@ describe(active, () => {
         await Util.get(active)
     })
 })
-// let post_chunks = a[0] + '/pds/oca-schema-chunks/'
-// describe(post_chunks, () => {
-//     it('POST OcaSchemaChunks', async () => {
-//         let res
-//         try {
-//             res = let data = 
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//     })
-//     let get_chunks = post_chunks + data.oca_schema_chunks_query
-//     console.log(get_chunks)
-//     it('GET OcaSchemaChunks', async () => {
-//         let res
-//         try {
-//             res = await Util.get(get_chunks)
-//         }
-//         catch (err) { throw Error("Invalid response") }
 
-//         expect(res.status).to.equal(200)
-//         expect(res).to.satisfyApiSpec
-//     })
-// })
+let chunks = a[0] + URL.pdsChunks
+describe(chunks, () => {
+    it('POST OcaSchemaChunks', async () => {
+        await Util.post(chunks, data.oca_schema_chunks)
+    })
+    let chunkQuery = chunks + data.oca_schema_chunks_query
+    it('GET OcaSchemaChunks', async () => {
+        let res = await Util.get(chunkQuery)
+    })
+})
 
 const save_url = a[0] + URL.pdsSave
 describe(save_url, () => {
