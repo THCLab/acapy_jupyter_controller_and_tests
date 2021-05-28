@@ -12,7 +12,7 @@ const URL = {
     createAdminInv: "/connections/create-admin-invitation-url",
     createInv: "/connections/create-invitation?alias=agent_connection&auto_accept=true&multi_use=true",
     receiveInv: "/connections/receive-invitation?auto_accept=true",
-    createInv: "/wallet/did/create",
+    createDID: "/wallet/did/create",
     LEDGER_URL: "http://localhost:9000",
     setPublicDID: "/wallet/did/public",
     pdsSettings: '/pds/settings',
@@ -129,6 +129,7 @@ let Util = {
                 invalidCodepath(error, "Agent" + String(i))
             }
         }
+
         let j = 1
         for (i in [0, 1]) {
             try {
@@ -151,7 +152,7 @@ let Util = {
         let verkey
         let alias = agent
 
-        let res = await axios.post(agent + URL.createInv)
+        let res = await axios.post(agent + URL.createDID)
         did = res.data['result']['did']
         verkey = res.data['result']['verkey']
         assert(did)

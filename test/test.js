@@ -10,19 +10,21 @@ const chaiResponseValidator = require('chai-openapi-response-validator')
 const data = require('./data')
 chai.use(chaiResponseValidator(script_path))
 
+
+
 let settings = a[0] + URL.pdsSettings
 describe(settings, () => {
     it('POST Add Local', async () => {
         await Util.post(settings, data.pds_set_settings_local)
-    })
-    it('POST Add OwnYourData', async () => {
-        await Util.post(settings, data.pds_set_settings_oyd)
     })
     it('POST Add Invalid', async () => {
         await Util.postInvalid(settings, data.pds_set_settings_invalid, 408)
     })
     it('GET', async () => {
         await Util.get(settings)
+    })
+    it('POST Add OwnYourData', async () => {
+        await Util.post(settings, data.pds_set_settings_oyd)
     })
 })
 
@@ -31,22 +33,37 @@ describe(activate, () => {
     it('POST Activate Local', async () => {
         await Util.post(activate, data.pds_activate_local)
     })
-    it('POST Activate OwnYourData', async () => {
-        await Util.post(activate, data.pds_activate_own_your_data_data_vault)
-    })
     it('POST Activate THCF', async () => {
         await Util.postInvalid(activate, data.pds_activate_thcf, 404)
     })
     it('POST Activate Invalid', async () => {
         await Util.postInvalid(activate, data.pds_activate_invalid, 422, false)
     })
+    it('POST Activate OwnYourData', async () => {
+        await Util.post(activate, data.pds_activate_own_your_data_data_vault)
+    })
 })
+
+describe("Documents", () => {
+    let documentsMine = a[0] + "/documents/mine"
+    let documentsGiven = a[0] + "/documents/given"
+    it("/documents/mine", async () => {
+        let res = await Util.get(documentsMine)
+        console.log(res.data)
+    })
+    it("/documents/given", async () => {
+        let res = await Util.get(documentsGiven)
+        console.log(res.data)
+    })
+})
+
 let get_drivers = a[0] + URL.pdsDrivers
 describe(get_drivers, () => {
     it('GET Registered Drivers', async () => {
         await Util.get(get_drivers)
     })
 })
+
 let active = a[0] + URL.pdsActive
 describe(active, () => {
     it('GET Active', async () => {
@@ -62,7 +79,8 @@ describe(chunks, () => {
     let chunkQuery = chunks + data.oca_schema_chunks_query
     it('GET OcaSchemaChunks', async () => {
         let res = await Util.get(chunkQuery)
-    })
+        assert(res.data[0].payload.length != 0)
+    }).timeout(3000)
 })
 
 const save_url = a[0] + URL.pdsSave
@@ -97,7 +115,6 @@ describe(servicesConsentURL, () => {
     })
 
     it('POST Add Service', async () => {
-        console.log(consentDRI)
         const res = await Util.post(servicesAddURL, {
             "consent_dri": consentDRI,
             "service_schema_dri": "3trgwgwfsv" + Util.randomNumber(),

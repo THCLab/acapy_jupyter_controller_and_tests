@@ -51,7 +51,7 @@ async function post(agent, path, json) {
     let result
     try {
         result = await axios.post(agent + path, json)
-    } catch (error) { Util.InvalidCodepath(error); result = error['response'] }
+    } catch (error) { Util.invalidCodepath(error); result = error['response'] }
     return result['data']
 }
 
@@ -122,7 +122,7 @@ describe("", () => {
             assert(addService != undefined, "addService is undefined")
             serv = seekService(serviceList['data']['result']['services'], addService['data']['service_id'])
             assert(serv != undefined, "service is undefined")
-        } catch (error) { Util.InvalidCodepath(error) }
+        } catch (error) { Util.invalidCodepath(error) }
 
         assert(serv != undefined, "service is undefined")
         let apply = await post(a[0], "/verifiable-services/apply", {
