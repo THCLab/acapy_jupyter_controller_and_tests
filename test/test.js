@@ -49,12 +49,10 @@ describe("Documents", () => {
     let documentsGiven = a[0] + "/documents/given"
     it("/documents/mine", async () => {
         let res = await Util.get(documentsMine)
-        console.log(res.data)
-    })
+    }).timeout(5000)
     it("/documents/given", async () => {
         let res = await Util.get(documentsGiven)
-        console.log(res.data)
-    })
+    }).timeout(5000)
 })
 
 let get_drivers = a[0] + URL.pdsDrivers
